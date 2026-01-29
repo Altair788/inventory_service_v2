@@ -38,6 +38,9 @@ class SQLAlchemyCategoryRepository(CategoryRepository):
         await self.session.flush()
         await self.session.refresh(db_category)
 
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
+
         return Category(
             id=db_category.id,
             name=db_category.name,
@@ -115,6 +118,9 @@ class SQLAlchemyCategoryRepository(CategoryRepository):
         )
         await self.session.flush()
 
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
+
         return await self.get_by_id(category.id)
 
     async def delete(self, category_id: int) -> bool:
@@ -122,6 +128,10 @@ class SQLAlchemyCategoryRepository(CategoryRepository):
             delete(CategoryModel).where(CategoryModel.id == category_id)
         )
         await self.session.flush()
+
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
+
         return result.rowcount > 0
 
 
@@ -141,6 +151,9 @@ class SQLAlchemyItemRepository(ItemRepository):
         self.session.add(db_item)
         await self.session.flush()
         await self.session.refresh(db_item)
+
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
 
         return Item(
             id=db_item.id,
@@ -200,6 +213,9 @@ class SQLAlchemyItemRepository(ItemRepository):
         )
         await self.session.flush()
 
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
+
         return await self.get_by_id(item.id)
 
     async def update_quantity(self, item_id: int, quantity: int) -> bool:
@@ -207,6 +223,10 @@ class SQLAlchemyItemRepository(ItemRepository):
             update(ItemModel).where(ItemModel.id == item_id).values(quantity=quantity)
         )
         await self.session.flush()
+
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
+
         return result.rowcount > 0
 
     async def delete(self, item_id: int) -> bool:
@@ -214,6 +234,10 @@ class SQLAlchemyItemRepository(ItemRepository):
             delete(ItemModel).where(ItemModel.id == item_id)
         )
         await self.session.flush()
+
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
+
         return result.rowcount > 0
 
 
@@ -228,6 +252,9 @@ class SQLAlchemyClientRepository(ClientRepository):
         self.session.add(db_client)
         await self.session.flush()
         await self.session.refresh(db_client)
+
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
 
         return Client(
             id=db_client.id,
@@ -276,6 +303,9 @@ class SQLAlchemyClientRepository(ClientRepository):
         )
         await self.session.flush()
 
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
+
         return await self.get_by_id(client.id)
 
     async def delete(self, client_id: int) -> bool:
@@ -283,6 +313,10 @@ class SQLAlchemyClientRepository(ClientRepository):
             delete(ClientModel).where(ClientModel.id == client_id)
         )
         await self.session.flush()
+
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
+
         return result.rowcount > 0
 
 
@@ -301,6 +335,9 @@ class SQLAlchemyOrderRepository(OrderRepository):
         self.session.add(db_order)
         await self.session.flush()
         await self.session.refresh(db_order)
+
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
 
         return Order(
             id=db_order.id,
@@ -356,6 +393,9 @@ class SQLAlchemyOrderRepository(OrderRepository):
         )
         await self.session.flush()
 
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
+
         return await self.get_by_id(order.id)
 
     async def update_total_amount(self, order_id: int, amount: Decimal) -> bool:
@@ -365,6 +405,10 @@ class SQLAlchemyOrderRepository(OrderRepository):
             .values(total_amount=amount)
         )
         await self.session.flush()
+
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
+
         return result.rowcount > 0
 
     async def delete(self, order_id: int) -> bool:
@@ -372,6 +416,10 @@ class SQLAlchemyOrderRepository(OrderRepository):
             delete(OrderModel).where(OrderModel.id == order_id)
         )
         await self.session.flush()
+
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
+
         return result.rowcount > 0
 
 
@@ -391,6 +439,9 @@ class SQLAlchemyOrderItemRepository(OrderItemRepository):
         self.session.add(db_order_item)
         await self.session.flush()
         await self.session.refresh(db_order_item)
+
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
 
         return OrderItem(
             id=db_order_item.id,
@@ -440,7 +491,7 @@ class SQLAlchemyOrderItemRepository(OrderItemRepository):
         ]
 
     async def get_by_order_and_item(
-        self, order_id: int, item_id: int
+            self, order_id: int, item_id: int
     ) -> Optional[OrderItem]:
         result = await self.session.execute(
             select(OrderItemModel)
@@ -468,6 +519,10 @@ class SQLAlchemyOrderItemRepository(OrderItemRepository):
             .values(quantity=quantity)
         )
         await self.session.flush()
+
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
+
         return result.rowcount > 0
 
     async def delete(self, order_item_id: int) -> bool:
@@ -475,4 +530,8 @@ class SQLAlchemyOrderItemRepository(OrderItemRepository):
             delete(OrderItemModel).where(OrderItemModel.id == order_item_id)
         )
         await self.session.flush()
+
+        # 🔑 Сохраняем изменения в БД
+        await self.session.commit()
+
         return result.rowcount > 0

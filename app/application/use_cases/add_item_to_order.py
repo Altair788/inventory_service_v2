@@ -1,30 +1,22 @@
-from app.domain.entities import (
-    AddItemToOrderRequest,
-    AddItemToOrderResponse,
-    OrderItem
-)
-from app.domain.interfaces import (
-    ItemRepository,
-    OrderRepository,
-    OrderItemRepository
-)
+from app.core.logger import logger
+from app.domain.entities import AddItemToOrderRequest, AddItemToOrderResponse, OrderItem
+from app.domain.interfaces import ItemRepository, OrderItemRepository, OrderRepository
 from app.infrastructure.exceptions import (
+    BusinessException,
+    InsufficientStockException,
     ItemNotFoundException,
     OrderNotFoundException,
-    InsufficientStockException,
-    BusinessException
 )
-from app.core.logger import logger
 
 
 class AddItemToOrderUseCase:
     """Use case for adding items to orders."""
 
     def __init__(
-            self,
-            item_repository: ItemRepository,
-            order_repository: OrderRepository,
-            order_item_repository: OrderItemRepository
+        self,
+        item_repository: ItemRepository,
+        order_repository: OrderRepository,
+        order_item_repository: OrderItemRepository,
     ):
         self.item_repository = item_repository
         self.order_repository = order_repository
@@ -46,7 +38,9 @@ class AddItemToOrderUseCase:
             order = await self.order_repository.get_by_id(request.order_id)
             if not order:
                 logger.warning(f"Order not found: {request.order_id}")
-                raise OrderNotFoundException(f"Order with ID {request.order_id} not found")
+                raise OrderNotFoundException(
+                    f"Order with ID {request.order_id} not found"
+                )
 
             # Validate item exists
             item = await self.item_repository.get_by_id(request.item_id)
@@ -66,17 +60,17 @@ class AddItemToOrderUseCase:
                 )
 
             # Check if item already in order
-            existing_order_item = await self.order_item_repository.get_by_order_and_item(
-                request.order_id,
-                request.item_id
+            existing_order_item = (
+                await self.order_item_repository.get_by_order_and_item(
+                    request.order_id, request.item_id
+                )
             )
 
             if existing_order_item:
                 # Update existing order item quantity
                 new_quantity = existing_order_item.quantity + request.quantity
                 await self.order_item_repository.update_quantity(
-                    existing_order_item.id,
-                    new_quantity
+                    existing_order_item.id, new_quantity
                 )
                 order_item_id = existing_order_item.id
                 logger.info(
@@ -89,7 +83,7 @@ class AddItemToOrderUseCase:
                     order_id=request.order_id,
                     item_id=request.item_id,
                     quantity=request.quantity,
-                    unit_price=item.price
+                    unit_price=item.price,
                 )
                 created_order_item = await self.order_item_repository.create(order_item)
                 order_item_id = created_order_item.id
@@ -99,20 +93,24 @@ class AddItemToOrderUseCase:
 
             # Update item stock
             new_item_quantity = item.quantity - request.quantity
-            await self.item_repository.update_quantity(request.item_id, new_item_quantity)
+            await self.item_repository.update_quantity(
+                request.item_id, new_item_quantity
+            )
             logger.info(
                 f"Updated item {item.id} stock: {item.quantity} -> {new_item_quantity}"
             )
 
             # Update order total amount
             total_amount = await self._calculate_order_total(request.order_id)
-            await self.order_repository.update_total_amount(request.order_id, total_amount)
+            await self.order_repository.update_total_amount(
+                request.order_id, total_amount
+            )
             logger.info(f"Updated order {request.order_id} total: {total_amount}")
 
             return AddItemToOrderResponse(
                 success=True,
                 message="Item successfully added to order",
-                order_item_id=order_item_id
+                order_item_id=order_item_id,
             )
 
         except BusinessException:

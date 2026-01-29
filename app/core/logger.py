@@ -4,10 +4,11 @@ from loguru import logger
 
 from app.core.config import settings
 
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-LOG_DIR = PROJECT_ROOT / "logs"
-LOG_DIR.mkdir(exist_ok=True)
-LOG_FILE = LOG_DIR / "app.log"
+#PROJECT_ROOT = Path(__file__).parent.parent.parent
+#LOG_DIR = PROJECT_ROOT / "logs"
+#LOG_DIR.mkdir(exist_ok=True)
+# LOG_FILE = LOG_DIR / "app.log"
+LOG_FILE = Path("/tmp/app.log")
 
 logger.remove()
 

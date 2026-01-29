@@ -1,36 +1,45 @@
 [tool.poetry]
-name = "inventory-service"
+name = "inventory-management-system"
 version = "0.1.0"
-description = "Inventory management API with orders and categories"
+description = "Inventory management system with REST API for order management"
 authors = ["eduard <slobodyanik.ed@gmail.com>"]
 readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.11,<4.0"
+
 fastapi = "^0.115.0"
 uvicorn = {extras = ["standard"], version = "^0.30.0"}
 sqlalchemy = "^2.0.30"
+
 asyncpg = "^0.29.0"
+psycopg2-binary = "^2.9.9"
+
+
 pydantic = "^2.11.7"
-pydantic-settings = "^2.5.2"
+pydantic-settings = "^2.6.0"
+python-dotenv = "^1.0.1"
+
+alembic = "^1.13.1"
 loguru = "^0.7.3"
-environs = "^14.2.0"
+
 python-multipart = "^0.0.9"
-redis = "^5.0.0"
+
+redis = "^5.0.1"
 websockets = "^12.0"
-grpcio = "^1.60.0"
-grpcio-tools = "^1.60.0"
+grpcio = "^1.62.0"
+grpcio-tools = "^1.62.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.0.0"
-pytest-asyncio = "^0.23.0"
+pytest = "^8.2.0"
+pytest-asyncio = "^0.23.5"
 pytest-cov = "^5.0.0"
-httpx = "^0.28.0"
+httpx = "^0.27.0"
 ruff = "^0.5.0"
-black = "^24.0.0"
-isort = "^5.13.0"
-pre-commit = "^3.6.0"
+black = "^24.4.2"
+isort = "^5.13.2"
+pre-commit = "^3.7.1"
 factory-boy = "^3.3.0"
 
 [build-system]

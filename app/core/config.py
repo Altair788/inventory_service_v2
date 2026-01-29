@@ -1,31 +1,65 @@
+from typing import List
+
 from pydantic import Field
-from environs import Env
-from typing import Optional
-
-env = Env()
-env.read_env()
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings:
-    # Database
-    db_host: str = env.str("DB_HOST", "localhost")
-    db_port: int = env.int("DB_PORT", 5432)
-    db_user: str = env.str("DB_USER", "postgres")
-    db_password: str = env.str("DB_PASSWORD", "postgres")
-    db_name: str = env.str("DB_NAME", "inventory_db")
+class Settings(BaseSettings):
+    """Application configuration settings."""
+
+    # Database settings
+    postgres_host: str = Field(default="localhost", description="PostgreSQL host")
+    postgres_port: int = Field(default=5432, description="PostgreSQL port")
+    postgres_user: str = Field(default="postgres", description="PostgreSQL user")
+    postgres_password: str = Field(
+        default="password", description="PostgreSQL password"
+    )
+    postgres_db: str = Field(
+        default="inventory_db", description="PostgreSQL database name"
+    )
+
+    # Application settings
+    debug: bool = Field(default=False, description="Debug mode")
+    app_host: str = Field(default="0.0.0.0", description="Application host")
+    app_port: int = Field(default=8000, description="Application port")
+    api_prefix: str = Field(default="/api/v1", description="API prefix")
+
+    # CORS settings
+    cors_origins: str = Field(
+        default="http://localhost:3000,http://localhost:8080",
+        description="CORS allowed origins",
+    )
+
+    # Logging settings
+    log_level: str = Field(default="INFO", description="Logging level")
 
     @property
-    def database_url(self) -> str:
-        return f"postgresql+asyncpg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+    def database_url_async(self) -> str:
+        """Async database URL for SQLAlchemy."""
+        return (
+            f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}"
+            f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+        )
 
-    # Redis (для кэширования)
-    redis_host: str = env.str("REDIS_HOST", "localhost")
-    redis_port: int = env.int("REDIS_PORT", 6379)
+    @property
+    def database_url_sync(self) -> str:
+        """Sync database URL for Alembic."""
+        return (
+            f"postgresql://{self.postgres_user}:{self.postgres_password}"
+            f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+        )
 
-    # Server
-    debug: bool = env.bool("DEBUG", False)
-    host: str = env.str("HOST", "0.0.0.0")
-    port: int = env.int("PORT", 8000)
+    @property
+    def cors_origins_list(self) -> List[str]:
+        """Parse CORS origins string to list."""
+        return [origin.strip() for origin in self.cors_origins.split(",")]
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
 
 
 settings = Settings()

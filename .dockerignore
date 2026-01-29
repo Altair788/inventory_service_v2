@@ -5,13 +5,15 @@ __pycache__
 *.pyd
 .Python
 .env
+.env.example_local
 .git
 .gitignore
 Dockerfile
 docker-compose.yml
 README.md
+logs/
 tests/
-scripts/
+scripts/test_*.py
 docs/
 *.md
 *.log

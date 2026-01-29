@@ -1,6 +1,4 @@
-from pydantic import Field
 from environs import Env
-from typing import Optional
 
 env = Env()
 env.read_env()

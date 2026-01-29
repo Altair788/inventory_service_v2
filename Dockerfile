@@ -1,40 +1,48 @@
 FROM python:3.12-slim
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    POETRY_VERSION=1.8.3 \
-    POETRY_HOME=/opt/poetry \
-    POETRY_VIRTUALENVS_CREATE=false \
-    POETRY_NO_INTERACTION=1
-
-# Install system dependencies
+# Установка системных зависимостей
 RUN apt-get update && apt-get install -y \
     gcc \
+    libpq-dev \
     postgresql-client \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
-RUN pip install "poetry==$POETRY_VERSION"
+# Установка Poetry
+ENV POETRY_VERSION=1.8.3 \
+    POETRY_HOME=/opt/poetry \
+    POETRY_VIRTUALENVS_CREATE=false \
+    POETRY_NO_INTERACTION=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 
-# Set working directory
+RUN pip install "poetry==$POETRY_VERSION" && \
+    rm -rf /root/.cache/pip
+
+# Рабочая директория
 WORKDIR /app
 
-# Copy poetry files
-COPY pyproject.toml poetry.lock* /app/
+# Копирование зависимостей
+COPY pyproject.toml poetry.lock* ./
 
-# Install dependencies
-RUN poetry install --no-dev --no-interaction --no-ansi
+# Установка только продакшен-зависимостей
+RUN poetry install --no-dev --no-interaction --no-ansi && \
+    rm -rf /root/.cache/pypoetry
 
-# Copy application code
-COPY . /app
+# Копирование приложения
+COPY . .
 
-# Create non-root user
-RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+# Создание не-root пользователя
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app && \
+    chmod -R 755 /app
+
 USER appuser
 
-# Expose port
+# Проверка работоспособности
+RUN poetry run python -c "from app.core.config import settings; print('✅ Config loaded:', settings.postgres_host)"
+
 EXPOSE 8000
 
-# Run application
-CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Запуск приложения
+CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]

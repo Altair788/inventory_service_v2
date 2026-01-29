@@ -1,6 +1,7 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field
 from typing import List
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -10,8 +11,12 @@ class Settings(BaseSettings):
     postgres_host: str = Field(default="localhost", description="PostgreSQL host")
     postgres_port: int = Field(default=5432, description="PostgreSQL port")
     postgres_user: str = Field(default="postgres", description="PostgreSQL user")
-    postgres_password: str = Field(default="password", description="PostgreSQL password")
-    postgres_db: str = Field(default="inventory_db", description="PostgreSQL database name")
+    postgres_password: str = Field(
+        default="password", description="PostgreSQL password"
+    )
+    postgres_db: str = Field(
+        default="inventory_db", description="PostgreSQL database name"
+    )
 
     # Application settings
     debug: bool = Field(default=False, description="Debug mode")
@@ -22,7 +27,7 @@ class Settings(BaseSettings):
     # CORS settings
     cors_origins: str = Field(
         default="http://localhost:3000,http://localhost:8080",
-        description="CORS allowed origins"
+        description="CORS allowed origins",
     )
 
     # Logging settings

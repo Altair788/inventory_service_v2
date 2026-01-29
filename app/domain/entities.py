@@ -1,12 +1,13 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
 from decimal import Decimal
+from typing import Optional
 
 
 @dataclass
 class Category:
     """Category entity with hierarchical structure."""
+
     id: Optional[int] = None
     name: str = ""
     parent_id: Optional[int] = None
@@ -19,6 +20,7 @@ class Category:
 @dataclass
 class Item:
     """Item/Nomenclature entity."""
+
     id: Optional[int] = None
     name: str = ""
     quantity: int = 0
@@ -31,6 +33,7 @@ class Item:
 @dataclass
 class Client:
     """Client entity."""
+
     id: Optional[int] = None
     name: str = ""
     address: str = ""
@@ -41,6 +44,7 @@ class Client:
 @dataclass
 class Order:
     """Order entity."""
+
     id: Optional[int] = None
     client_id: int = 0
     status: str = "pending"
@@ -52,6 +56,7 @@ class Order:
 @dataclass
 class OrderItem:
     """Order item entity (many-to-many relationship)."""
+
     id: Optional[int] = None
     order_id: int = 0
     item_id: int = 0
@@ -64,6 +69,7 @@ class OrderItem:
 @dataclass
 class AddItemToOrderRequest:
     """Request entity for adding item to order."""
+
     order_id: int
     item_id: int
     quantity: int
@@ -72,6 +78,7 @@ class AddItemToOrderRequest:
 @dataclass
 class AddItemToOrderResponse:
     """Response entity for adding item to order."""
+
     success: bool
     message: str
     order_item_id: Optional[int] = None

@@ -9,10 +9,8 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# 🔑 Ключевое: подставляем URL из настроек
-config.set_main_option("sqlalchemy.url", settings.database_url)
+config.set_main_option("sqlalchemy.url", settings.database_url_sync)
 
-# Метаданные для автогенерации
 target_metadata = Base.metadata
 
 
